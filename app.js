@@ -63,9 +63,57 @@ const configureApp = async () => {
   app.use((err, req, res, next) => {
     console.error(err);
     console.log(req.originalUrl);
-    res.status(err.status || 500).send(err.message || "Internal server error.");  // Status code 500 Internal Server Error - server error
-  });
-};
+  
+    // Handle Sequelize Validation Errors
+    if (err.name === 'SequelizeValidationError') {
+          const validationErrors = err.errors.map(error => ({
+        field: error.path,
+        message: error.message,
+        value: error.value
+      }));
+      
+      return res.status(400).json({
+        error: 'Validation Error',
+        message: 'Please check the provided data',
+        details: validationErrors
+      });
+    }
+    
+    // Handle Sequelize Unique Constraint Errors
+    if (err.name === 'SequelizeUniqueConstraintError') {
+      return res.status(409).json({
+        error: 'Duplicate Entry',
+        message: 'A record with this information already exists',
+        details: err.errors.map(error => ({
+          field: error.path,
+          message: error.message
+        }))
+      });
+    }
+    
+    // Handle Sequelize Foreign Key Constraint Errors
+    if (err.name === 'SequelizeForeignKeyConstraintError') {
+      return res.status(400).json({
+        error: 'Invalid Reference',
+        message: 'Referenced record does not exist'
+      });
+    }
+    
+    // Handle Sequelize Database Connection Errors
+    if (err.name === 'SequelizeConnectionError') {
+      return res.status(503).json({
+        error: 'Database Connection Error',
+        message: 'Unable to connect to database'
+      });
+    }
+    
+    // Handle generic errors
+    res.status(err.status || 500).json({
+      error: 'Internal Server Error',
+      message: err.message || "An unexpected error occurred"
+    });
+  }
+)}; 
 
 /* SET UP BOOT FOR SERVER APPLICATION */
 // Construct the boot process by incorporating all needed processes
