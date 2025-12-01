@@ -11,16 +11,27 @@ const campus_image_url='https://images.pexels.com/photos/207692/pexels-photo-207
 const Campus = db.define("campus", {
   name: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      notEmpty: {
+        msg: "Campus name cannot be empty"
+      }
+    }
   },
 
   address: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    validate: {
+      notEmpty: {
+        msg: "Campus address cannot be empty"
+      }
+    }
   },
 
   description: {
-    type: Sequelize.STRING,
+    type: Sequelize.TEXT,
+    allowNull: true
   },
   imageUrl: {
     type: Sequelize.STRING,
