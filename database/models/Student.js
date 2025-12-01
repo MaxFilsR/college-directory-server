@@ -10,19 +10,28 @@ const student_image_url='https://images.pexels.com/photos/20230197/pexels-photo-
 const Student = db.define("student", {
   firstname: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    notEmpty:{
+      msg:"First name cannot be empty"
+    }
   },
 
   lastname: {
     type: Sequelize.STRING,
-    allowNull: false
+    allowNull: false,
+    notEmpty:{
+      msg:"Last name cannot be empty"
+    }
   },
   email: {
     type: Sequelize.STRING,
     allowNull: false,
     // unique: true,
     validate: {
-      isEmail: true
+      isEmail: true,
+      notEmpty:{
+        msg:"Email cannot be empty"
+      },
     }
   },
   imageUrl: {
